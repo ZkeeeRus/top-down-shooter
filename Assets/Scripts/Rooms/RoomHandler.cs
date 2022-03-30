@@ -105,6 +105,12 @@ public class RoomHandler : MonoBehaviour
         player.Exp += 5 * enemiesCount;
        
 
+        if (isBoss)
+        {
+            transform.Find("Hole").GetComponent<Collider2D>().enabled = true;
+            transform.Find("Hole").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Decals/Hole");
+        }
+
         SetLockingBlocksActive(false);
     }
 }

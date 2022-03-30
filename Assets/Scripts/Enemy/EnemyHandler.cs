@@ -28,7 +28,7 @@ public class EnemyHandler : MonoBehaviour
 
     private enum Enemy
     {
-        Turret,
+        Scout,
         Soldier
     }
     [Space]
@@ -154,7 +154,7 @@ public class EnemyHandler : MonoBehaviour
                 cooldown = .5f;
                 _fire = true;
             }
-            else if (enemyType == Enemy.Turret)
+            else if (enemyType == Enemy.Scout)
             {
                 bulletInRow = 4;
                 cooldown = .4f;
@@ -185,9 +185,11 @@ public class EnemyHandler : MonoBehaviour
 
         switch (enemyType)
         {
-            case Enemy.Turret:
+            case Enemy.Scout:
                 {
                     bodySprite.flipX = false;
+
+                    //bodySprite.sortingLayerName = "Scout";
 
                     if (angle < 135 && angle > 45)
                         bodySprite.sprite = enemySprites[2];
@@ -219,13 +221,28 @@ public class EnemyHandler : MonoBehaviour
                         bodySprite.sprite = enemySprites[4];
                         bodySprite.flipX = true;
                     }
+                   // bodySprite.sortingLayerName = "Soldier";
                 }
                 break;
         }
 
         if (angle > 45 && angle < 135)
+        {
+            if(enemyType == Enemy.Soldier)
+                bodySprite.sortingLayerName = "SoldierUp";
+            else if (enemyType == Enemy.Scout)
+                bodySprite.sortingLayerName = "ScoutUp";
+
             bodySprite.sortingOrder = 12;
+        }
         else
+        {
+            if (enemyType == Enemy.Soldier)
+                bodySprite.sortingLayerName = "Soldier";
+            else if (enemyType == Enemy.Scout)
+                bodySprite.sortingLayerName = "Scout";
+
             bodySprite.sortingOrder = 10;
+        }
     }
 }

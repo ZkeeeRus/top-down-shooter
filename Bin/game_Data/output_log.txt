@@ -1,0 +1,39 @@
+Initialize engine version: 5.6.7f1 (e80cc3114ac1)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 10.1]
+    Renderer: ATI Mobility Radeon HD 4500/5100 Series (ID=0x9553)
+    Vendor:   ATI
+    VRAM:     890 MB
+    Driver:   8.970.100.1100
+Begin MonoManager ReloadAssembly
+Platform assembly: D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.062 seconds
+Platform assembly: D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: D:\Unity\Projects\Top Down Shooter\Bin\game_Data\Managed\System.dll (this message is harmless)
+<RI> Initializing input.
+<RI> Input initialized.
+desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0
+<RI> Initialized touch support.
+UnloadTime: 3.486755 ms
+GfxDevice: creating device client; threaded=1
+GfxDevice: creating device client; threaded=1
+:
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+:
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+:
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+

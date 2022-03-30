@@ -75,6 +75,7 @@
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_AutoRotate.cs" />
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_LightFlicker.cs" />
      <Compile Include="Assets\JMO Assets\Cartoon FX\Scripts\CFX_LightIntensityFade.cs" />
+     <Compile Include="Assets\Scripts\AmbientSound.cs" />
      <Compile Include="Assets\Scripts\Bullet.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyHandler.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyShootProjectile.cs" />
@@ -87,6 +88,7 @@
      <Compile Include="Assets\Scripts\Player\PlayerAim.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerHandler.cs" />
      <Compile Include="Assets\Scripts\Player\PlayerShootProjectile.cs" />
+     <Compile Include="Assets\Scripts\Rooms\EnterNextFloor.cs" />
      <Compile Include="Assets\Scripts\Rooms\EnterNextRoom.cs" />
      <Compile Include="Assets\Scripts\Rooms\Locks.cs" />
      <Compile Include="Assets\Scripts\Rooms\Menu\LightBlinking.cs" />

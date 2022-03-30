@@ -42,7 +42,7 @@ public class Bullet : MonoBehaviour
                 int gunType = playerGun.currentGun;
                 int damage = 20 - gunType * 5 * addDamage;
 
-                // Debug.Log(damage);
+                 //Debug.Log(damage);
 
                 health = collision.GetComponent<EnemyHandler>().healthSystem;
                 health.Damage(damage);
@@ -59,7 +59,7 @@ public class Bullet : MonoBehaviour
         }
         else if (collision.tag == "Wall" || collision.tag == "LockWall")
         {
-            GameObject hit = Instantiate(hitPrefab, transform.position, Quaternion.identity);
+            GameObject hit = Instantiate(hitPrefab, transform.position + new Vector3(0,0, -0.2f), Quaternion.Euler(0, 0, -180));
             Destroy(hit, .5f);
             Destroy(gameObject);
         }

@@ -25,7 +25,11 @@ public class EnemyShootProjectile : MonoBehaviour
         bulletTransform.GetComponent<Bullet>().Setup(shootDirection);
 
         //UtilsClass.ShakeCamera(.05f, .2f);
-        CreateShootFlash(e.gunEndPointPosition);
+        if(shootFlashSprite != null)
+            CreateShootFlash(e.gunEndPointPosition);
+
+        GetComponent<AudioSource>().Play();
+
     }
     private void CreateShootFlash(Vector3 spawnPosition)
     {

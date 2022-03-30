@@ -31,27 +31,6 @@ public class RoomPlacer : MonoBehaviour
 
             PlaceOneRoom(isBossRoom);
         }
-
-        //Debug.Log(spawnedRooms.GetLength(0) + " " + roomsWidth);
-        //Debug.Log(spawnedRooms.GetLength(1) + " " + roomsHeight);
-        //string roomsStr = "", nums = "";
-
-        //for (int j = spawnedRooms.GetLength(1) - 1; j >= 0; j--)
-        //{
-        //    for (int i = 0; i > spawnedRooms.GetLength(0); i++)
-        //    {
-        //        if (spawnedRooms[i, j] != null)
-        //            roomsStr += "◙";
-        //        else
-        //            roomsStr += "•";
-
-        //        nums += i + ":" + j + " ";
-        //    }
-        //    roomsStr += "\n";
-        //    nums += "\n";
-        //}
-        //Debug.Log(roomsStr);
-        //Debug.Log(nums);
     }
     private void PlaceOneRoom(bool isBossRoom)
     {
