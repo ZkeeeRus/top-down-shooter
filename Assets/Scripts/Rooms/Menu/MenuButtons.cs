@@ -7,7 +7,6 @@ public class MenuButtons : MonoBehaviour
 {
     public void PlayClick()
     {
-        Debug.Log(":");
-        SceneManager.LoadSceneAsync("main");
+        ScreenLoad.LoadScene("main");
     }
 }

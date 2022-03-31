@@ -8,17 +8,17 @@ public class KeyboardBinds : MonoBehaviour
     private void Update()
     {
         if (Input.GetAxis("Exit") > 0)
-            Application.Quit();
+            ScreenLoad.LoadScene("StartMenu");
 
         if (Input.GetKeyDown(KeyCode.P))
         {
             PlayerPrefs.DeleteAll();
 
-            SceneManager.LoadSceneAsync("main");
+            ScreenLoad.LoadScene("main");
         }
         else if (Input.GetKeyDown(KeyCode.O))
         {
-            SceneManager.LoadSceneAsync("main");
+            ScreenLoad.LoadScene("main");
         }
     }
 }

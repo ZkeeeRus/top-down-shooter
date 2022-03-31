@@ -10,7 +10,7 @@ public class EnterNextFloor : MonoBehaviour
         if (collider.CompareTag("Player"))
         {
             
-            SceneManager.LoadSceneAsync("main");
+            ScreenLoad.LoadScene("main");
         }
     }
 }
