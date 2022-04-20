@@ -1,4 +1,5 @@
 ﻿using CodeMonkey.Utils;
+using Pathfinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -26,13 +27,24 @@ public class EnemyHandler : MonoBehaviour
     [SerializeField] private float speed;
     [SerializeField] private float range;
 
-    private enum Enemy
+     float nextWaypointDistance = 3f;
+     Path path;
+     int currentWaypoint = 0;
+     bool isEndOfPathReached = false;
+
+     Seeker seeker;
+     Rigidbody2D rb;
+
+
+    public enum Enemy
     {
         Scout,
-        Soldier
+        Soldier,
+        Boss,
+        Generator
     }
     [Space]
-    [SerializeField] private Enemy enemyType;
+    public Enemy enemyType;
 
     [SerializeField] private Sprite[] enemySprites;
     private SpriteRenderer bodySprite;
@@ -58,27 +70,76 @@ public class EnemyHandler : MonoBehaviour
         level = PlayerPrefs.GetInt("Level", 0);
 
         target = FindObjectOfType<Movement>().transform;
-        aimTransform = transform.Find("EnemyAim");
-        aimAnimator = aimTransform.GetComponent<Animator>();
+        if (enemyType != Enemy.Generator)
+        {
+            aimTransform = transform.Find("EnemyAim");
+            aimAnimator = aimTransform.GetComponent<Animator>();
 
-        aimGunEndPointTransform = aimTransform.Find("GunEndPoint");
+            aimGunEndPointTransform = aimTransform.Find("GunEndPoint");
+        }
+        
         bodyTransform = transform.Find("Body");
         bodySprite = bodyTransform.GetComponent<SpriteRenderer>();
 
-        healthSystem = new HealthSystem(100 + 10 * level);
-        healthBar.Setup(healthSystem);
 
-        healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
+
+
+        if (enemyType == Enemy.Boss)
+        {
+            healthSystem = new HealthSystem(HealthSystem.HealthType.Boss, level);
+            healthBar.Setup(healthSystem);
+
+            healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
+
+            bulletInRow = 1;
+            cooldown = 1f;
+            _fire = true;
+        }
+        else if(enemyType == Enemy.Generator)
+        {
+            healthSystem = new HealthSystem(HealthSystem.HealthType.Object, level);
+            healthBar.Setup(healthSystem);
+            healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
+        }
+        else
+        {
+            seeker = GetComponent<Seeker>();
+            rb = GetComponent<Rigidbody2D>();
+
+            InvokeRepeating("UpdatePath", 0f, .5f);
+
+            healthSystem = new HealthSystem(HealthSystem.HealthType.Enemy, level);
+            healthBar.Setup(healthSystem);
+
+            healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
+        }
+
+    }
+    private void UpdatePath()
+    {
+        if(seeker.IsDone())
+            seeker.StartPath(rb.position - new Vector2(0f, 1.5f), target.position, OnPathComplete);
+    }
+    private void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            path = p;
+            currentWaypoint = 0;
+        }
     }
 
     private void HealthSystem_OnHealthChanged(object sender, EventArgs e)
     {
         if (healthSystem.GetHealth() <= 0)
         {
-            GameObject prfExplode = (GameObject)Instantiate(explode, transform.position, Quaternion.identity);
+            GameObject prfExplode = (GameObject)Instantiate(explode, transform.position + new Vector3(0, 0, -1.75f), Quaternion.identity);
             Destroy(prfExplode, .5f);
             if (OnEnemyDead != null)
+            {
+                
                 OnEnemyDead(this, EventArgs.Empty);
+            }
 
             Destroy(gameObject);
         }
@@ -86,22 +147,28 @@ public class EnemyHandler : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (Vector3.Distance(target.position, transform.position) <= range)
+        if (GameAssets.isPlayerDeath)
+            return;
+
+        if (enemyType == Enemy.Generator)
+            return;
+
+        if (enemyType != Enemy.Boss)
         {
-            FollowPlayer();
+            if (path == null)
+                return;
+            if (Vector3.Distance(target.position, transform.position) <= range)
+            {
+                FollowPlayer();
+                AimAtPlayer();
+            }
+        }
+        else
+        {
             AimAtPlayer();
         }
-    }
 
-    //public void ShootAtPlayer()
-    //{
-    //    aimAnimator.SetTrigger("Shoot");
-    //    OnShoot.Invoke(this, new OnShootEventArgs
-    //    {
-    //        gunEndPointPosition = aimGunEndPointTransform.position,
-    //        shootPosition = target.position + UtilsClass.GetRandomDir() * -1.5f
-    //    });
-    //}
+    }
     IEnumerator FireA()
     {
         if (!mayFire)
@@ -140,24 +207,54 @@ public class EnemyHandler : MonoBehaviour
 
     public void FollowPlayer()
     {
-        if (Vector3.Distance(target.position, transform.position) > range / 1.3)
+        Vector3 previous = path.vectorPath[0];
+        float allDistance = 0f;
+        for (int i = 1; i < path.vectorPath.Count; i++)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.fixedDeltaTime);
-            _fire = false;
-            return;
+            allDistance += Vector3.Distance(previous, path.vectorPath[i]);
+            previous = path.vectorPath[i];
+        }
+        //Vector3.Distance(target.position, transform.position) > range / 2.5
+        
+        if (allDistance > range / 2.5)
+        {
+            //transform.position = Vector3.MoveTowards(transform.position, target.transform.position, speed * Time.fixedDeltaTime);
+            if (currentWaypoint >= path.vectorPath.Count)
+            {
+                isEndOfPathReached = true;
+            }
+            else
+            {
+                isEndOfPathReached = false;
+
+                Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint] - rb.position).normalized;
+                Vector2 force = direction * speed * 500 * Time.deltaTime;
+                rb.AddForce(force);
+                
+                float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
+                if (distance < nextWaypointDistance)
+                {
+                    currentWaypoint++;
+                }
+
+                _fire = false;
+                return;
+            }
+
+
         }
         if (Random.Range(1f, 5f) > 4.9f)
         {
             if (enemyType == Enemy.Soldier)
             {
                 bulletInRow = 3;
-                cooldown = .5f;
+                cooldown = .6f;
                 _fire = true;
             }
             else if (enemyType == Enemy.Scout)
             {
                 bulletInRow = 4;
-                cooldown = .4f;
+                cooldown = .5f;
                 _fire = true;
             }
         }
@@ -168,7 +265,6 @@ public class EnemyHandler : MonoBehaviour
     }
     public void AimAtPlayer()
     {
-
         Vector3 aimDirection = (target.position - transform.position).normalized;
         float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         aimTransform.eulerAngles = new Vector3(0, 0, angle);
@@ -225,24 +321,27 @@ public class EnemyHandler : MonoBehaviour
                 }
                 break;
         }
-
-        if (angle > 45 && angle < 135)
+        if (enemyType != Enemy.Boss)
         {
-            if(enemyType == Enemy.Soldier)
-                bodySprite.sortingLayerName = "SoldierUp";
-            else if (enemyType == Enemy.Scout)
-                bodySprite.sortingLayerName = "ScoutUp";
+            if (angle > 45 && angle < 135)
+            {
+                if (enemyType == Enemy.Soldier)
+                    bodySprite.sortingLayerName = "SoldierUp";
+                else if (enemyType == Enemy.Scout)
+                    bodySprite.sortingLayerName = "ScoutUp";
 
-            bodySprite.sortingOrder = 12;
-        }
-        else
-        {
-            if (enemyType == Enemy.Soldier)
-                bodySprite.sortingLayerName = "Soldier";
-            else if (enemyType == Enemy.Scout)
-                bodySprite.sortingLayerName = "Scout";
+                bodySprite.sortingOrder = 12;
+            }
+            else
+            {
+                if (enemyType == Enemy.Soldier)
+                    bodySprite.sortingLayerName = "Soldier";
+                else if (enemyType == Enemy.Scout)
+                    bodySprite.sortingLayerName = "Scout";
 
-            bodySprite.sortingOrder = 10;
+                bodySprite.sortingOrder = 10;
+            }
         }
+        
     }
 }

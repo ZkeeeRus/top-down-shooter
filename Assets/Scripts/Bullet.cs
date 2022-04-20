@@ -1,4 +1,5 @@
 ﻿using CodeMonkey.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,10 +16,20 @@ public class Bullet : MonoBehaviour
     public Guns playerGun;
 
     private int addDamage;
+    private AudioSource audioSource;
+    public enum BulletType
+    {
+        Simple,
+        Bomb
+    }
+    public BulletType bulletType;
 
     private void Start()
     {
         addDamage = PlayerPrefs.GetInt("AddDamage", 1);
+
+        if(bulletType == BulletType.Bomb)
+            audioSource = GetComponent<AudioSource>();
     }
 
     public void Setup(Vector3 shootDirection)
@@ -39,27 +50,64 @@ public class Bullet : MonoBehaviour
         {
             try
             {
-                int gunType = playerGun.currentGun;
-                int damage = 20 - gunType * 5 * addDamage;
-
-                 //Debug.Log(damage);
+                int gunType = playerGun.currentGun + 1;
+                int damage = 5 + gunType * 5 * addDamage;
 
                 health = collision.GetComponent<EnemyHandler>().healthSystem;
                 health.Damage(damage);
+                PopUpHandler.Create(transform.position, damage);
                 Destroy(gameObject);
             }
-            catch { }
+            catch (Exception e)
+            {
+               // Debug.Log(collision.tag + " вызвал " + e.Message);
+            }
         }
         else if (collision.tag == "Player")
         {
             health = collision.GetComponent<PlayerHandler>().healthSystem;
+            int damage = 10 + 5 * PlayerPrefs.GetInt("Level", 0);
 
-            health.Damage(10 * addDamage);
-            Destroy(gameObject);
+            if (bulletType == BulletType.Simple)
+            {
+               
+                health.Damage(damage);
+                PopUpHandler.Create(transform.position, damage);
+                Destroy(gameObject);
+            }
+            else
+            {
+                Vector3 pos = Camera.main.transform.position;                
+                AudioSource.PlayClipAtPoint(audioSource.clip, new Vector3(pos.x, pos.y, pos.z + 1));
+
+                damage += PlayerPrefs.GetInt("Level", 0) * 3;
+                health.Damage(damage);
+                PopUpHandler.Create(transform.position, damage);
+
+                GameObject hit = Instantiate(hitPrefab, transform.position + new Vector3(0, 0, -0.2f), Quaternion.Euler(0, 0, -180));
+                Destroy(hit, .5f);
+
+                Destroy(gameObject);
+
+            }
+
+
         }
         else if (collision.tag == "Wall" || collision.tag == "LockWall")
         {
-            GameObject hit = Instantiate(hitPrefab, transform.position + new Vector3(0,0, -0.2f), Quaternion.Euler(0, 0, -180));
+            if (bulletType == BulletType.Bomb)
+            {
+                Vector3 pos = Camera.main.transform.position;
+                AudioSource.PlayClipAtPoint(audioSource.clip, new Vector3(pos.x, pos.y, pos.z + 1));
+            }
+
+            GameObject hit = Instantiate(hitPrefab, transform.position + new Vector3(0, 0, -0.2f), Quaternion.Euler(0, 0, -180));
+            Destroy(hit, .5f);
+            Destroy(gameObject);
+        }
+        else if (collision.tag == "Shield" && this.tag != "BossBullet")
+        {
+            GameObject hit = Instantiate(hitPrefab, transform.position + new Vector3(0, 0, -0.2f), Quaternion.Euler(0, 0, -180));
             Destroy(hit, .5f);
             Destroy(gameObject);
         }

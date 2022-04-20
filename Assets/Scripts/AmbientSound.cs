@@ -6,24 +6,39 @@ using Random = UnityEngine.Random;
 
 public class AmbientSound : MonoBehaviour
 {
-    [SerializeField] private AudioClip[] songs;
+    [SerializeField] private AudioClip[] mainSongs;
+    [SerializeField] private AudioClip[] bossSongs;
+    private AudioClip mainSong, bossSong;
     private AudioSource audioSource;
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
 
+        mainSong = null;
+        bossSong = null;
+
         ChooseSong();
     }
 
-    private void ChooseSong()
+    public void ChooseSong()
     {
-        AudioClip song = songs[Random.Range(0, songs.Length)];
+        if (mainSong == null)
+        {
+            mainSong = mainSongs[Random.Range(0, mainSongs.Length)];
+        }
 
-        if (song == null)
-            return;
+        audioSource.clip = mainSong;
+        audioSource.Play();
+    }
+    public void ChooseBossSong()
+    {
+        if (bossSong == null)
+        {
+            bossSong = bossSongs[Random.Range(0, bossSongs.Length)];
+        }
 
-        audioSource.clip = song;
+        audioSource.clip = bossSong;
         audioSource.Play();
     }
 }

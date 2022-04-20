@@ -14,13 +14,16 @@ public class RoomHandler : MonoBehaviour
     
     [SerializeField] private Transform[] spawnPositions;
     [SerializeField] private GameObject[] enemiesPrefab;
+    [SerializeField] private GameObject[] bossesPrefab;
 
     private GameObject enemy;
-    private List<GameObject> enemies = new List<GameObject>();
+    public List<GameObject> enemies = new List<GameObject>();
 
     private PlayerHandler player;
 
     private GameObject[] lockingBlocks = new GameObject[4];
+
+    private AmbientSound audioPlayer;
 
     private void Start()
     {
@@ -32,6 +35,8 @@ public class RoomHandler : MonoBehaviour
         isBoss = GetComponentInParent<Room>().isBoss;
 
         player = FindObjectOfType<PlayerHandler>();
+
+        audioPlayer = FindObjectOfType<AmbientSound>();
     }
     private void OnTriggerEnter2D(Collider2D collider)
     {
@@ -67,10 +72,28 @@ public class RoomHandler : MonoBehaviour
 
     private void StartBattle()
     {
-        for (int i = 0; i < 2; i++)
+        if (isBoss)
         {
-            SpawnEnemy();
+            SpawnBoss();
         }
+        else
+        {
+            int i = 0, count = Random.Range(1,3);
+            while (i < count)
+            {
+                int randomSpawn = Random.Range(0, spawnPositions.Length);
+                var point = spawnPositions[randomSpawn].GetComponent<SpawnPointHandler>();
+                //Debug.Log(point);
+                if (!point.isSpawned)
+                {
+                    SpawnEnemy(randomSpawn);
+                    point.isSpawned = true;
+                    i++;
+                }
+
+            }
+        }
+
         enemiesCount = enemies.Count;
 
 
@@ -80,20 +103,48 @@ public class RoomHandler : MonoBehaviour
 
         //Debug.Log("Enter");
     }
-    private void SpawnEnemy()
+    private void SpawnEnemy(int spawnPoint)
     {
-        int randomSpawn = Random.Range(0, spawnPositions.Length);
+        
+        enemy = Instantiate(enemiesPrefab[Random.Range(0, enemiesPrefab.Length)], spawnPositions[spawnPoint]);
 
-        enemy = Instantiate(enemiesPrefab[Random.Range(0, enemiesPrefab.Length)], spawnPositions[randomSpawn]);
         enemy.transform.SetParent(transform);
         enemies.Add(enemy);
 
         enemy.GetComponent<EnemyHandler>().OnEnemyDead += RoomHandler_OnEnemyDead;
     }
+    private void SpawnBoss()
+    {
+        enemy = Instantiate(bossesPrefab[0], spawnPositions[0]);
+
+        enemy.transform.SetParent(transform);
+        enemies.Add(enemy);
+
+        enemy.GetComponent<EnemyHandler>().OnEnemyDead += RoomHandler_OnEnemyDead;
+
+
+        var shield = Instantiate(bossesPrefab[1], spawnPositions[0]);
+        shield.transform.SetParent(transform);
+
+
+        var shieldGenerator = Instantiate(bossesPrefab[2], spawnPositions[1]);
+        shieldGenerator.transform.SetParent(transform);
+        shieldGenerator.GetComponent<EnemyHandler>().OnEnemyDead += RoomHandler_OnEnemyDead;
+
+        audioPlayer.ChooseBossSong();
+    }
 
     private void RoomHandler_OnEnemyDead(object sender, System.EventArgs e)
     {
-        enemies.RemoveRange(0, 1);
+        if ((sender as EnemyHandler).enemyType == EnemyHandler.Enemy.Generator)
+        {
+            
+            Destroy(transform.Find("Shield(Clone)").gameObject);
+        }
+        else
+        {
+            enemies.RemoveRange(0, 1);
+        }
     }
 
     private void EndBattle()
@@ -112,5 +163,6 @@ public class RoomHandler : MonoBehaviour
         }
 
         SetLockingBlocksActive(false);
+        audioPlayer.ChooseSong();
     }
 }

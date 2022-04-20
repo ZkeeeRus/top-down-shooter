@@ -17,6 +17,8 @@ public class RoomPlacer : MonoBehaviour
     [SerializeField] private int roomsWidth;
     [SerializeField] private int roomsHeight;
 
+    AstarPath path;
+
     private void Start()
     {
         roomsWidth = Random.Range(5, 9);
@@ -31,6 +33,9 @@ public class RoomPlacer : MonoBehaviour
 
             PlaceOneRoom(isBossRoom);
         }
+
+        path = FindObjectOfType<AstarPath>();
+        path.Scan();
     }
     private void PlaceOneRoom(bool isBossRoom)
     {

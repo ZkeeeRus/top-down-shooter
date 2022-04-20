@@ -10,9 +10,11 @@ public class PlayerShootProjectile : MonoBehaviour
 
     [SerializeField]
     private Sprite shootFlashSprite;
+    private AudioSource audioSource;
     private void Awake()
     {
         GetComponent<PlayerAim>().OnShoot += PlayerShootProjectile_OnShoot;
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void PlayerShootProjectile_OnShoot(object sender, PlayerAim.OnShootEventArgs e)
@@ -30,7 +32,8 @@ public class PlayerShootProjectile : MonoBehaviour
         //UtilsClass.ShakeCamera(.05f, .2f);
         CreateShootFlash(e.gunEndPointPosition);
 
-        GetComponent<AudioSource>().Play();
+        Vector3 pos = Camera.main.transform.position;
+        AudioSource.PlayClipAtPoint(audioSource.clip, new Vector3(pos.x, pos.y, pos.z + 1));
     }
     private void CreateShootFlash(Vector3 spawnPosition)
     {

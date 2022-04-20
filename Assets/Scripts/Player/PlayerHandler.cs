@@ -23,12 +23,12 @@ public class PlayerHandler : MonoBehaviour
             if (exp / 25 >= 1)
             {
                 LevelUp();
-                if (level % 2 == 0)
+                if (Level % 2 == 0)
                     DamageUp();
             }
         }
     }
-    private int level
+    public int Level
     {
         get
         {
@@ -39,38 +39,53 @@ public class PlayerHandler : MonoBehaviour
             PlayerPrefs.SetInt("Level", value);
         }
     }
-    private int addictiveDamage
+    public int AddictiveDamage
     {
         get
         {
-            return PlayerPrefs.GetInt("AddDamage", 0);
+            return PlayerPrefs.GetInt("AddDamage", 1);
         }
         set
         {
             PlayerPrefs.SetInt("AddDamage", value);
         }
     }
+
+
     private void Start()
     {
-        healthSystem = new HealthSystem(100);
+        healthSystem = new HealthSystem(Level, PlayerPrefs.GetFloat("PlayerHealth", 100 + Level * 10));
         healthBar.Setup(healthSystem);
 
-        //level = PlayerPrefs.GetInt("level", 1);
-        level = 1;
+        healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
+        //level = 1;
     }
+
+    private void HealthSystem_OnHealthChanged(object sender, System.EventArgs e)
+    {
+        PlayerPrefs.SetFloat("PlayerHealth", healthSystem.GetHealth());
+
+        if (healthSystem.GetHealth() <= 0)
+        {
+            if (PlayerPrefs.GetInt("LevelRecord", 0) < Level)
+                PlayerPrefs.SetInt("LevelRecord", Level);
+
+            transform.gameObject.SetActive(false);
+            GameAssets.isPlayerDeath = true;
+
+            ScreenLoad.LoadScene("StartMenu");
+        }
+    }
+
     public void LevelUp()
     {
-        healthSystem.IncreaseHealth(level);
+        Level++;
+        Exp -= 25;
 
-        level++;
-        exp -= 25;
-
-        //PlayerPrefs.SetInt("level", level);
-
-        Debug.Log(healthSystem.GetHealth());
+        healthSystem.IncreaseHealth(Level);
     }
     public void DamageUp()
     {
-
+        AddictiveDamage++;
     }
 }

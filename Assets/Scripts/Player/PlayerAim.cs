@@ -28,6 +28,8 @@ public class PlayerAim : MonoBehaviour
     private int bulletInRow;
     private bool mayFire = true;
     private bool fire;
+
+    private Vector3 randomDir;
     public bool _fire { get { return fire; } set { fire = value; if (value == true) StartCoroutine(FireA()); } }
 
     private void Awake()
@@ -40,6 +42,9 @@ public class PlayerAim : MonoBehaviour
 
     private void Update()
     {
+        if (GameAssets.isPlayerDeath)
+            return;
+
         HandleAiming();
         HandleShooting();
     }
@@ -91,11 +96,20 @@ public class PlayerAim : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             if (gunType == 0)
-                bulletInRow = 1;
-            else if (gunType == 1)
-                bulletInRow = 3;
-            else if (gunType == 2)
+            {
+                randomDir = UtilsClass.GetRandomDir();
                 bulletInRow = 5;
+            }
+            else if (gunType == 1)
+            {
+                randomDir = UtilsClass.GetRandomDir() / 2;
+                bulletInRow = 3;
+            }
+            else if (gunType == 2)
+            {
+                randomDir = Vector3.zero;
+                bulletInRow = 1;
+            }
             _fire = true;
         }
         else
@@ -123,7 +137,7 @@ public class PlayerAim : MonoBehaviour
                     OnShoot.Invoke(this, new OnShootEventArgs
                     {
                         gunEndPointPosition = aimGunEndPointTransform.position,
-                        shootPosition = mousePosition /* + UtilsClass.GetRandomDir() */
+                        shootPosition = mousePosition + randomDir
                     });
                     aimAnimator.SetTrigger("Shoot");
                 }

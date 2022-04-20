@@ -16,42 +16,66 @@ public class Movement : MonoBehaviour
 	public float CamOffset;
 
 	private float endurance = 100;
+	private bool isTired = false;
+
+	private GameObject enduranceBar;
 
 	private void Start()
 	{
 		body = GetComponent<Rigidbody2D>();
 		body.freezeRotation = true;
 		body.gravityScale = 0;
+
+		enduranceBar = transform.Find("EnduranceBar").gameObject;
 	}
 
 	private void FixedUpdate()
 	{
+		if (GameAssets.isPlayerDeath)
+			return;
+
 		HandleShift();
 		HandleMovement();
 	}
 
 	private void HandleShift()
     {
-		if ( endurance > 1.2f && Input.GetKey(KeyCode.LeftShift))
+		if ( !isTired && endurance > 1.2f && Input.GetKey(KeyCode.LeftShift) && direction.magnitude > 0.1)
 		{
 			endurance -= 35f * Time.deltaTime;
 
 			speed = 3.5f;
 			acceleration = 170;
+
+			if (!enduranceBar.activeInHierarchy)
+				enduranceBar.SetActive(true);
 		}
 		else
 		{
-            if (!Input.GetKey(KeyCode.LeftShift))
-            {
-				if (endurance < 100)
-					endurance += 25f * Time.deltaTime;
-				else
-					endurance = 100;
+			if (endurance < 100)
+			{
+				if (endurance <= 1.2)
+					isTired = true;
+
+				endurance += 25f * Time.deltaTime;
+
+				if (!enduranceBar.activeInHierarchy)
+					enduranceBar.SetActive(true);
+			}
+			else
+			{
+				isTired = false;
+				endurance = 100;
+
+				if (enduranceBar.activeInHierarchy)
+					enduranceBar.SetActive(false);
 			}
 
 			speed = 2.5f;
 			acceleration = 170;
 		}
+		if(enduranceBar.activeInHierarchy)
+			enduranceBar.transform.Find("Endurance").localScale = new Vector3(endurance / 100f, 1);
 		//Debug.Log(endurance);
 	}
 

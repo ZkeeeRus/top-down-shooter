@@ -11,15 +11,16 @@ public class HealthBar : MonoBehaviour
         this.healthSystem = healthSystem;
 
         this.healthSystem.OnHealthChanged += HealthSystem_OnHealthChanged;
-
-        transform.Find("HealthBar").localScale = new Vector3(healthSystem.GetHealthPercent(), 1);
-        transform.parent.Find("HP Count").GetComponent<Text>().text = healthSystem.GetHealth().ToString();
+        
+        LoadHealToCounter();
     }
 
     private void HealthSystem_OnHealthChanged(object sender, System.EventArgs e)
     {
-        //Debug.Log(233);
-
+        LoadHealToCounter();
+    }
+    private void LoadHealToCounter()
+    {
         transform.Find("HealthBar").localScale = new Vector3(healthSystem.GetHealthPercent(), 1);
 
         try

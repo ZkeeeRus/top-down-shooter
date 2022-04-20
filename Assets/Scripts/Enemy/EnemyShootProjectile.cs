@@ -11,9 +11,13 @@ public class EnemyShootProjectile : MonoBehaviour
     [SerializeField]
     private Sprite shootFlashSprite;
 
+    private AudioSource audioSource;
+
     private void Awake()
     {
         GetComponent<EnemyHandler>().OnShoot += EnemyShootProjectile_OnShoot;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void EnemyShootProjectile_OnShoot(object sender, EnemyHandler.OnShootEventArgs e)
@@ -28,7 +32,8 @@ public class EnemyShootProjectile : MonoBehaviour
         if(shootFlashSprite != null)
             CreateShootFlash(e.gunEndPointPosition);
 
-        GetComponent<AudioSource>().Play();
+        Vector3 pos = Camera.main.transform.position;
+        AudioSource.PlayClipAtPoint(audioSource.clip, new Vector3(pos.x, pos.y, pos.z + 1));
 
     }
     private void CreateShootFlash(Vector3 spawnPosition)

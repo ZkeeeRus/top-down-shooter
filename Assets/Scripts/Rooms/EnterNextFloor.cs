@@ -9,7 +9,7 @@ public class EnterNextFloor : MonoBehaviour
     {
         if (collider.CompareTag("Player"))
         {
-            
+            collider.gameObject.SetActive(false);
             ScreenLoad.LoadScene("main");
         }
     }

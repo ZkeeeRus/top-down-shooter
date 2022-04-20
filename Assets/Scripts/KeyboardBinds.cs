@@ -5,20 +5,27 @@ using UnityEngine.SceneManagement;
 
 public class KeyboardBinds : MonoBehaviour
 {
+    PlayerHandler player;
+    private void Start()
+    {
+        player = FindObjectOfType<PlayerHandler>();
+    }
     private void Update()
     {
-        if (Input.GetAxis("Exit") > 0)
+        if (Input.GetKeyDown(KeyCode.Escape))
             ScreenLoad.LoadScene("StartMenu");
 
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            PlayerPrefs.DeleteAll();
+        if (Input.GetKeyDown(KeyCode.H))
+            player.healthSystem.Heal();
+        //if (Input.GetKeyDown(KeyCode.P))
+        //{
+        //    PlayerPrefs.DeleteAll();
 
-            ScreenLoad.LoadScene("main");
-        }
-        else if (Input.GetKeyDown(KeyCode.O))
-        {
-            ScreenLoad.LoadScene("main");
-        }
+        //    ScreenLoad.LoadScene("main");
+        //}
+        //else if (Input.GetKeyDown(KeyCode.O))
+        //{
+        //    ScreenLoad.LoadScene("main");
+        //}
     }
 }
